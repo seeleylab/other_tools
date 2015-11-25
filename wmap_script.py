@@ -15,12 +15,12 @@ else:
 
 #If FC w-maps are wanted,  prompt user for processedfmri folder name and seed folder name.
 if processing_type == 'FC':
-    processedfmri_folder = raw_input('\nAll subjects are assumed to have a processedfmri_TRCNnSFmDI folder. If your subjects have a processedfmri folder with a different extension, specify that folder below. Otherwise, hit Enter.\n')
+    processedfmri_folder = raw_input('\nAll subjects are assumed to have a processedfmri_TRCNnSFmDI folder. If your subjects have a processedfmri folder with a different extension, specify that folder below (e.g. processedfmri_RTCsNsSFmI). Otherwise, hit Enter.\n')
     if processedfmri_folder == '':
         processedfmri_folder = 'processedfmri_TRCNnSFmDI'
     else:
         pass
-    seed_folder = raw_input('Specify the folder containing the seed results for each subject:\n')
+    seed_folder = raw_input('Specify the folder containing the seed results for each subject (e.g. stats_FC_L_PostCen_4--42_-20_56_roi):\n')
 
 #Prompt user for Excel spreadsheet containing subjdir column and covariate columns.
 xl_f = raw_input('\n2. Enter the path of the Excel spreadsheet containing the subjects you want W-maps for.\n')
@@ -50,7 +50,7 @@ if processing_type == 'GMA':
     print('Finished checking.')
     
 #Prompt user for the mask.
-mask = raw_input('\n3. Enter the path of the mask.\n')
+mask = raw_input('\n3. Enter the path of the whole brain mask.\n')
 while not os.path.isfile(mask):
     mask = raw_input('Error--Specified mask is not a valid file path. Enter the path of the mask.\n')
 
