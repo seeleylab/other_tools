@@ -72,10 +72,10 @@ while covs != list(df.columns.values)[1:]:
 suffix = raw_input('\n6. Enter a concise descriptive suffix for your w-map analysis results folders. Do not use spaces. (e.g. 12GRNps_vs_120HC)\n')
 
 ########################################################### CALCULATIONS ###########################################################################
-os.system('fslmaths '+HC_model+'/ResMS.nii -sqrt '+HC_model+'/sqrt_res')        #Calculate denominator for all subjects (HC regression model residuals SD map)
+os.system('fslmaths '+HC_model+'/ResMS.nii -sqrt '+HC_model+'/sqrt_res')        #Calculate denominator for all subjects (HC regr model residuals SD map)
 denominator = HC_model+'/sqrt_res'
 
-for index,row in df.iterrows():         #Loop through each subject and define paths for FC and GMA options...
+for index,row in df.iterrows():         #Loop through each subject and define paths for FC and GMA options. Then...
     subj = row  
     if processing_type == 'FC':
         wmapdir = subj['subjdir']+'/'+processedfmri_folder+'/'+seed_folder+'/wmap_'+suffix
@@ -84,25 +84,34 @@ for index,row in df.iterrows():         #Loop through each subject and define pa
         wmapdir = os.path.split(subj['subjdir'])[0]+'/struc/SPM12_SEG_Full/wmap_'+suffix
         actualimage = glob.glob(os.path.split(subj['subjdir'])[0]+'/struc/SPM12_SEG_Full/smwc1*')[0]
 
-    if os.path.exists(wmapdir):                     #...check if they have already been run, and skip if they have
+    if os.path.exists(wmapdir):                     #...check if they have already been run. Skip if they have, or else...
         print(os.path.split(subj['subjdir'])[0]+' has already been run! Will be skipped.')
     else:
-        os.system('mkdir '+wmapdir)                 #...create a "wmap" folder to catch output
-        
-        curr_value = HC_model+'/beta_0001.nii'      #...calculate pred covariate values and add to HC regression model intercept to get pred map
-        map_pred_for_subj = wmapdir+'/map_pred_for_subj'
+        os.system('mkdir '+wmapdir)                 #...create a "wmap" folder for each subject to catch output
+        os.chdir(wmapdir); f = open('log', 'w')     #...create a log file in each subject's "wmap" folder
+        map_pred_for_subj = wmapdir+'/map_pred_for_subj'    #...calculate pred covariate values
+        cov_images = []
         for j in range(1, len(covs)+1):
             cov_for_HC = HC_model+'/beta_000'+str(j+1)+'.nii'
             subj_value = str(subj[j])
             cov_pred_for_subj = wmapdir+'/cov_'+covs[j-1]
             os.system('fslmaths '+cov_for_HC+' -mul '+subj_value+' '+cov_pred_for_subj)
-            os.system('fslmaths '+cov_pred_for_subj+' -add '+curr_value+' '+map_pred_for_subj)
-            curr_value = map_pred_for_subj
+            cov_images.append(cov_pred_for_subj)
+            f.write('fslmaths '+cov_for_HC+' -mul '+subj_value+' '+cov_pred_for_subj+'\n\n')     #...record commands which create cov_pred images
             
-            os.system('fslmaths '+map_pred_for_subj+' -sub '+actualimage+' '+wmapdir+'/numerator')        #...calculate numerator (predicted - observed)
-            numerator = wmapdir+'/numerator'
+        cov_images_paths = ''                                                                    #...group all cov_pred image paths together
+        for k in range(0,len(cov_images)):
+            cov_images_paths += ' -add '+cov_images[k]
+            
+        os.system('fslmaths '+HC_model+'/beta_0001.nii'+cov_images_paths+' '+map_pred_for_subj)           #...calculate predicted map for subject
+        f.write('fslmaths '+HC_model+'/beta_0001.nii'+cov_images_paths+' '+map_pred_for_subj+'\n\n')      #...record command which creates predicted map
+            
+        os.system('fslmaths '+map_pred_for_subj+' -sub '+actualimage+' '+wmapdir+'/numerator')            #...calculate numerator (predicted - observed)
+        numerator = wmapdir+'/numerator'
+        f.write('fslmaths '+map_pred_for_subj+' -sub '+actualimage+' '+wmapdir+'/numerator\n\n')          #...record command which creates numerator
         
-            os.system('fslmaths '+numerator+' -div '+denominator+' -mas '+mask+' '+wmapdir+'/wmap')       #...calculate w-map
-                
+        os.system('fslmaths '+numerator+' -div '+denominator+' -mas '+mask+' '+wmapdir+'/wmap')           #...calculate w-map
+        f.write('fslmaths '+numerator+' -div '+denominator+' -mas '+mask+' '+wmapdir+'/wmap')             #...record command which creates wmap
+        f.close()
+        
         print 'wmap created for '+subj[0]
-         
