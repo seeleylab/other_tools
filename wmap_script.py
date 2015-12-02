@@ -1,8 +1,13 @@
-####################################################### w-map script 11/25/15 ########################################################################
+####################################################### w-map script 11/30/15 ########################################################################
+#DISCLAIMER: THE SEELEY LAB IS NOT RESPONSIBLE FOR ANY INACCURATE CONCLUSIONS DRAWN AS A RESULT OF USING THIS SCRIPT.
+
+#IF A DIFFERENT HC GROUP IS DESIRED, UNCOMMENT LINES 70-74 and 93 BEFORE RUNNING SCRIPT.
+
 #Import modules needed
 import os
 import glob
 import pandas
+import sys
 
 ########################################################### USER OPTIONS ###########################################################################
 #Prompt user to choose type of w-map.
@@ -23,7 +28,7 @@ if processing_type == 'FC':
     seed_folder = raw_input('Specify the folder containing the seed results for each subject (e.g. stats_FC_L_PostCen_4--42_-20_56_roi):\n')
 
 #Prompt user for Excel spreadsheet containing subjdir column and covariate columns.
-xl_f = raw_input('\n2. Enter the path of the Excel spreadsheet containing the subjects you want W-maps for.\n')
+xl_f = raw_input('\n2. Enter the path of the Excel spreadsheet containing the subjects you want w-maps for.\n')
 
 while not os.path.isfile(xl_f):
     xl_f = raw_input('Error--Specified spreadsheet is not a valid file path. Enter the path of the Excel spreadsheet containing the subjects you want W-maps for.\n')
@@ -56,20 +61,36 @@ mask = raw_input('\n3. Enter the path of the whole brain mask that the w-maps wi
 while not os.path.isfile(mask):
     mask = raw_input('Error--Specified mask is not a valid file path. Enter the path of the mask.\n')
 
-#Prompt user for the directory containing all of the HC regression model files.
-HC_model = raw_input('\n4. Enter the directory containing the HC regression model.\n')
+#Set HC group.
+if processing_type == 'FC':
+    HC_model = '/data2/mridata2/Suzee/studies/W-score_multiple_regressions/rsfmri_multiple_regressions/GRN_seeds/L_PCG'
+elif processing_type == 'GMA':
+    HC_model = '/data/mridata/asias/W-score/GRNpresymp_288HC_mulreg_nocenter_withAmbi'
 
-while not os.path.isdir(HC_model):
-    HC_model = raw_input('Error--Specified HC regression model is not a valid directory. Enter the directory containing the HC regression model.\n')
+#Prompt user for the directory containing all of the HC regression model files.
+#HC_model = raw_input('\nEnter the directory containing the HC regression model.\n')
+
+#while not os.path.isdir(HC_model):
+#    HC_model = raw_input('Error--Specified HC regression model is not a valid directory. Enter the directory containing the HC regression model.\n')
 
 #Prompt user for a list of covariates
-covs = eval(raw_input('\n5. Enter your covariates in the following format: [\'cov1\', \'cov2\', \'cov3\']. You MUST enter these in the same order as your beta maps from the HC regression model and in the same order as the columns in your spreadsheet.\n'))
+covs = eval(raw_input('\n4. Out of the following covariates--Age, Education, Gender, Handedness, Scanner, TIV--enter the covariates you are using in the following format: [\'cov1\', \'cov2\', \'cov3\']. \nYou MUST enter these in the same order as your beta maps from the HC regression model and in the same order as the columns in your spreadsheet.\n'))
 
 while covs != list(df.columns.values)[1:]:
-    covs = eval(raw_input('Error--Specified covariates not entered in correct format. Enter your covariates in the following format: [\'cov1\', \'cov2\', \'cov3\']. You MUST enter these in the same order as your beta maps from the HC regression model and in the same order as the columns in your spreadsheet.\n'))
+    covs = eval(raw_input('Error--Enter your covariates in the following format: [\'cov1\', \'cov2\', \'cov3\']. You MUST enter these in the same order as your beta maps from the HC regression model and in the same order as the columns in your spreadsheet.\n'))
 
-#Prompt user for a suffix which will be appended to all results folder names.
-suffix = raw_input('\n6. Enter a concise descriptive suffix for your w-map analysis results folders. Do not use spaces. (e.g. 12GRNps_vs_120HC)\n')
+covs_suffixes = {'Age': 'a', 'Education': 'e', 'Gender': 'g', 'Handedness': 'h', 'Scanner': 's', 'TIV': 't'}
+
+suffix = ''
+
+for c in sorted(covs):
+    if c not in covs_suffixes:
+        print('\nSorry, the covariate %s is not supported yet.'%(c))
+        sys.exit(1)
+    else:
+        suffix += covs_suffixes[c]
+
+#suffix = raw_input('\n6. Enter a concise descriptive suffix for your w-map analysis results folders. Do not use spaces.\n')
 
 ########################################################### CALCULATIONS ###########################################################################
 os.system('fslmaths '+HC_model+'/ResMS.nii -sqrt '+HC_model+'/sqrt_res')        #Calculate denominator for all subjects (HC regr model residuals SD map)
@@ -88,7 +109,7 @@ for index,row in df.iterrows():         #Loop through each subject and define pa
         print(os.path.split(subj['subjdir'])[0]+' has already been run! Will be skipped.')
     else:
         os.system('mkdir '+wmapdir)                 #...create a "wmap" folder for each subject to catch output
-        os.chdir(wmapdir); f = open('log', 'w')     #...create a log file in each subject's "wmap" folder
+        os.chdir(wmapdir); f = open('log', 'w')     #...initiate a log file in each subject's "wmap" folder
         map_pred_for_subj = wmapdir+'/map_pred_for_subj'    #...calculate pred covariate values
         cov_images = []
         for j in range(1, len(covs)+1):
@@ -112,6 +133,6 @@ for index,row in df.iterrows():         #Loop through each subject and define pa
         
         os.system('fslmaths '+numerator+' -div '+denominator+' -mas '+mask+' '+wmapdir+'/wmap')           #...calculate w-map
         f.write('fslmaths '+numerator+' -div '+denominator+' -mas '+mask+' '+wmapdir+'/wmap')             #...record command which creates wmap
-        f.close()
+        f.close()                                                                                         #...close each subject's log file
         
         print 'wmap created for '+subj[0]
