@@ -30,7 +30,8 @@ xl_f = raw_input('\n2. Enter the path of the Excel spreadsheet containing the su
 while not os.path.isfile(xl_f):
     xl_f = raw_input('Error--Specified spreadsheet is not a valid file path. Enter the path of the Excel spreadsheet containing the subjects you want w-maps for.\n')
 
-df = pandas.read_excel(xl_f)
+df = pandas.read_excel(xl_f)            #Read in spreadsheet as dataframe
+covs = list(df.columns.values)[1:]      #Read in covariates
 
 #If FC w-maps are wanted, check that each subjdir directory has a seed con_0001.nii file necessary for creating the w-maps.
 if processing_type == 'FC':
@@ -53,28 +54,22 @@ if processing_type == 'GMA':
     print('Finished checking.')
 
 #Prompt user for the directory containing all of the HC regression model files.
-HC_model = raw_input('\n3. Enter the directory containing the HC regression model.\n')
+HC_model = raw_input('\n3. Enter the directory containing the HC regression model. Please make sure that the order of the covariate columns in your spreadsheet matches the order of the beta maps in your HC regression model. If not, press Control-C to exit.\n')
 
 while not os.path.isdir(HC_model):
     HC_model = raw_input('Error--Specified HC regression model is not a valid directory. Enter the directory containing the HC regression model.\n')
-
-#Prompt user for a list of covariates
-covs = eval(raw_input('\n4. Enter your covariates in the following format: [\'cov1\', \'cov2\', \'cov3\']. You MUST enter these in the same order as your beta maps from the HC regression model and in the same order as the columns in your spreadsheet.\n'))
-
-while covs != list(df.columns.values)[1:]:
-    covs = eval(raw_input('Error--Specified covariates not entered in correct format. Enter your covariates in the following format: [\'cov1\', \'cov2\', \'cov3\']. You MUST enter these in the same order as your beta maps from the HC regression model and in the same order as the columns in your spreadsheet.\n'))
     
 #Prompt user for the mask.
-mask = raw_input('\n5. Enter the path of the whole brain mask that the w-maps will be masked to.\n')
+mask = raw_input('\n4. Enter the path of the whole brain mask that the w-maps will be masked to.\n')
 
 while not os.path.isfile(mask):
     mask = raw_input('Error--Specified mask is not a valid file path. Enter the path of the mask.\n')
 
 #Prompt user for a suffix which will be appended to all results folder names.
-suffix = raw_input('\n6. Enter a concise descriptive suffix for your w-map analysis results folders. Do not use spaces. (e.g. 12GRNps_vs_120HC)\n')
+suffix = raw_input('\n5. Enter a concise descriptive suffix for your w-map analysis results folders. Do not use spaces. (e.g. 12GRNps_vs_120HC)\n')
 
 ########################################################### CALCULATIONS ###########################################################################
-os.system('fslmaths '+HC_model+'/ResMS.nii -sqrt '+HC_model+'/sqrt_res')       #Calculate denominator for all subjects (HC regr model residuals SD map)
+os.system('fslmaths '+HC_model+'/ResMS.nii -sqrt '+HC_model+'/sqrt_res')       #Calculate denominator for all subjects (HC regr model sqrt residuals map)
 denominator = HC_model+'/sqrt_res'
 
 for index,row in df.iterrows():         #Loop through each subject and define paths for FC and GMA options. Then...
@@ -91,7 +86,7 @@ for index,row in df.iterrows():         #Loop through each subject and define pa
     else:
         os.system('mkdir '+wmapdir)                         #...create a "wmap" folder for each subject to catch output
         os.chdir(wmapdir); f = open('log', 'w')             #...open a log file in each subject's "wmap" folder
-        map_pred_for_subj = wmapdir+'/map_pred_for_subj'    #...define path for map predicted for subject 
+        map_pred_for_subj = wmapdir+'/map_pred_for_subj'    #...define path for map predicted for subject
         predmaps_for_covs_list = []                         #...calculate each subject's predicted maps for each covariate
         for j in range(1, len(covs)+1):
             beta_map = HC_model+'/beta_000'+str(j+1)+'.nii'
