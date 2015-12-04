@@ -1,4 +1,4 @@
-####################################################### w-map script 12/2/15 ########################################################################
+####################################################### w-map script 12/4/15 ########################################################################
 #DISCLAIMER: THE SEELEY LAB IS NOT RESPONSIBLE FOR ANY INACCURATE CONCLUSIONS DRAWN AS A RESULT OF USING THIS SCRIPT.
 
 #Import modules needed
@@ -60,9 +60,9 @@ while not os.path.isdir(HC_model):
     HC_model = raw_input('Error--Specified HC regression model is not a valid directory. Enter the directory containing the HC regression model.\n')
     
 #Prompt user for the mask.
-mask = raw_input('\n4. Enter the path of the whole brain mask that the w-maps will be masked to.\n')
+mask = raw_input('\n4. Enter the path of the whole brain mask that the w-maps will be masked to. Hit Enter if you do not want to mask your w-maps.\n')
 
-while not os.path.isfile(mask):
+if mask != '' and os.path.isfile(mask) == False:
     mask = raw_input('Error--Specified mask is not a valid file path. Enter the path of the mask.\n')
 
 #Prompt user for a suffix which will be appended to all results folder names.
@@ -107,8 +107,12 @@ for index,row in df.iterrows():         #Loop through each subject and define pa
         numerator = wmapdir+'/numerator'
         f.write('fslmaths '+map_pred_for_subj+' -sub '+actual_map+' '+wmapdir+'/numerator\n\n')          #...record command which creates numerator
         
-        os.system('fslmaths '+numerator+' -div '+denominator+' -mas '+mask+' '+wmapdir+'/wmap')           #...calculate w-map
-        f.write('fslmaths '+numerator+' -div '+denominator+' -mas '+mask+' '+wmapdir+'/wmap')             #...record command which creates wmap
-        f.close()                                                                                         #...close log file
+        if mask == '':
+            os.system('fslmaths '+numerator+' -div '+denominator+' '+wmapdir+'/wmap')                   #...calculate unmasked w-map
+            f.write('fslmaths '+numerator+' -div '+denominator+' '+wmapdir+'/wmap')                     #...record command which creates unmasked wmap
+        else:
+            os.system('fslmaths '+numerator+' -div '+denominator+' -mas '+mask+' '+wmapdir+'/wmap')     #...calculate masked w-map
+            f.write('fslmaths '+numerator+' -div '+denominator+' -mas '+mask+' '+wmapdir+'/wmap')       #...record command which creates masked wmap
+        f.close()                                                                                       #...close log file
         
         print 'wmap created for '+subj[0]
