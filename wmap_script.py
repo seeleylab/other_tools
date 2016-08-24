@@ -1,10 +1,4 @@
-####################################################### w-map script 1/29/16 ########################################################################
-#THIS SOFTWARE IS PROVIDED BY THE SEELEY LAB "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE SEELEY LAB BE LIABLE FOR ANY
-#DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-#GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-#CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-#ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+####################################################### w-map script 8/24/16 ########################################################################
 
 #Import modules needed
 import os
@@ -60,10 +54,10 @@ if processing_type == 'FC':
 if processing_type == 'GMA':
     print('Checking each subject for smwc1 image...')
     for i in df.ix[:,'subjdir']:
-        if len(glob.glob(os.path.split(i)[0]+'/struc/SPM12_SEG_Full/smwc1*')) == 1:
+        if len(glob.glob(i+'/smwc1*')[0]) == 1:
             pass
         else:
-            print('Error--'+os.path.split(i)[0]+'/struc/SPM12_SEG_Full/smwc1* does not exist. Run segmentation and try again.')  
+            print('Error--'+i+'/smwc1* does not exist. Run segmentation and try again.')  
     print('Finished checking.')
 
 #If WBD w-maps are wanted, check that each subjdir directory has a whole_brain_degree.nii file necessary for creating the w-maps.
@@ -101,14 +95,14 @@ for index,row in df.iterrows():         #Loop through each subject and define pa
         wmapdir = subj['subjdir']+'/'+processedfmri_folder+'/'+seed_folder+'/wmap_'+suffix
         actual_map = subj['subjdir']+'/'+processedfmri_folder+'/'+seed_folder+'/con_0001.nii'
     elif processing_type == 'GMA':
-        wmapdir = os.path.split(subj['subjdir'])[0]+'/struc/SPM12_SEG_Full/wmap_'+suffix
-        actual_map = glob.glob(os.path.split(subj['subjdir'])[0]+'/struc/SPM12_SEG_Full/smwc1*')[0]
+        wmapdir = subj['subjdir']+'/wmap_'+suffix
+        actual_map = glob.glob(subj['subjdir']+'/smwc1*')[0]
     elif processing_type == 'WBD':
         wmapdir = subj['subjdir']+'/'+processedfmri_folder+'/whole_brain_degree/wmap_'+suffix
         actual_map = subj['subjdir']+'/'+processedfmri_folder+'/whole_brain_degree/whole_brain_degree.nii'
 
     if os.path.exists(wmapdir):                     #...check if they have already been run. Skip if they have, or else...
-        print(os.path.split(subj['subjdir'])[0]+' has already been run! Will be skipped.')
+        print(subj['subjdir']+' has already been run! Will be skipped.')
     else:
         os.system('mkdir '+wmapdir)                         #...create a "wmap" folder for each subject to catch output
         os.chdir(wmapdir); f = open('log', 'w')             #...open a log file in each subject's "wmap" folder
