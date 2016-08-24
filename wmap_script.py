@@ -54,7 +54,7 @@ if processing_type == 'FC':
 if processing_type == 'GMA':
     print('Checking each subject for smwc1 image...')
     for i in df.ix[:,'subjdir']:
-        if len(glob.glob(i+'/smwc1*')[0]) == 1:
+        if len(glob.glob(i+'/smwc1*')) == 1:
             pass
         else:
             print('Error--'+i+'/smwc1* does not exist. Run segmentation and try again.')  
