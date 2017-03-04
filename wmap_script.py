@@ -54,7 +54,7 @@ if processing_type == 'FC':
 if processing_type == 'GMA':
     print('Checking each subject for smwc1 image...')
     for i in df.ix[:,'subjdir']:
-        if len(glob.glob(i+'/smwc1*_reg*')) == 1:
+        if len(glob.glob(i+'/smwwc1*')) == 1:
             pass
         else:
             print('Error--'+i+'/smwc1* does not exist. Run segmentation and try again.')  
@@ -96,7 +96,12 @@ for index,row in df.iterrows():         #Loop through each subject and define pa
         actual_map = subj['subjdir']+'/'+processedfmri_folder+'/'+seed_folder+'/con_0001.nii'
     elif processing_type == 'GMA':
         wmapdir = subj['subjdir']+'/wmap_'+suffix
-        actual_map = glob.glob(subj['subjdir']+'/smwc1*_reg*')[0]
+        # actual_map = glob.glob(subj['subjdir']+'/smwwc1*')[0]
+	actual_map_list = glob.glob(subj['subjdir']+'/smwwc1*')
+	if len(actual_map_list) < 1:
+		print(subj['subjdir']+' has no segmentation! Will be skipped.')
+	else:
+		actual_map = actual_map_list[0]
     elif processing_type == 'WBD':
         wmapdir = subj['subjdir']+'/'+processedfmri_folder+'/whole_brain_degree/wmap_'+suffix
         actual_map = subj['subjdir']+'/'+processedfmri_folder+'/whole_brain_degree/whole_brain_degree.nii'
