@@ -107,7 +107,7 @@ for index,row in df.iterrows():         #Loop through each subject and define pa
         wmapdir = subj['subjdir']+'/'+processedfmri_folder+'/whole_brain_degree/wmap_'+suffix
         actual_map = subj['subjdir']+'/'+processedfmri_folder+'/whole_brain_degree/whole_brain_degree.nii'
 
-    if os.path.exists(wmapdir):                     #...check if they have already been run. Skip if they have, or else...
+    if os.path.exists(os.path.join(wmapdir, 'wmap.nii')):                     #...check if they have already been run. Skip if they have, or else...
         print(os.path.split(subj['subjdir'])[0]+' has already been run! Will be skipped.')
     else:
         os.system('mkdir '+wmapdir)                         #...create a "wmap" folder for each subject to catch output
