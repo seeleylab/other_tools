@@ -13,10 +13,10 @@ import pandas
 
 ########################################################### USER OPTIONS ###########################################################################
 #Prompt user to choose type of w-map.
-processing_type = raw_input('1. Enter FC for functional connectivity w-map, GMA for gray matter atrophy w-map, or WBD for whole brain degree w-map.\n')
+processing_type = raw_input('1. Enter FC for functional connectivity w-map, GMA for gray matter atrophy w-map, WBD for whole brain degree w-map, or fALFF for fALFF w-map.\n')
 
-if processing_type != 'FC' and processing_type != 'GMA' and processing_type != 'WBD':
-    processing_type = raw_input('Error--Specified processing type is not a valid option. Enter FC for functional connectivity w-map or GMA for gray matter atrophy w-map.\n')
+if processing_type != 'FC' and processing_type != 'GMA' and processing_type != 'WBD' and processing_type != 'fALFF':
+    processing_type = raw_input('Error--Specified processing type is not a valid option. Enter FC for functional connectivity w-map, GMA for gray matter atrophy w-map, WBD for whole brain degree w-map, or fALFF for fALFF w-map.\n')
 else:
     pass
 
@@ -76,6 +76,16 @@ if processing_type == 'WBD':
             print('Error--'+i+'/'+processedfmri_folder+'/whole_brain_degree/whole_brain_degree.nii does not exist. Check and try again.')
     print('Finished checking.')
 
+#If fALFF w-maps are wanted, check that each subjdir directory has a mfALFFMap_detrend_LF.nii file necessary for creating the w-maps.
+if processing_type == 'fALFF':
+    print('Checking each subject for mfALFFMap_detrend_LF.nii image...')
+    for i in df.ix[:,'subjdir']:
+        if os.path.exists(i+'/'+'interfmri_TRCNnSFmDI/denoised/ALFF/ALFF_results/mfALFFMap_detrend_LF.nii'):
+            pass
+        else:
+            print('Error--'+i+'/'+'interfmri_TRCNnSFmDI/denoised/ALFF/ALFF_results/mfALFFMap_detrend_LF.nii does not exist. Check and try again.')
+    print('Finished checking.')
+
 #Prompt user for the directory containing all of the HC regression model files.
 HC_model = raw_input('\n3. Enter the directory containing the HC regression model. Please make sure that the order of the covariate columns in your spreadsheet matches the order of the beta maps in your HC regression model. If not, press Control-C to exit.\n')
 
@@ -106,6 +116,9 @@ for index,row in df.iterrows():         #Loop through each subject and define pa
     elif processing_type == 'WBD':
         wmapdir = subj['subjdir']+'/'+processedfmri_folder+'/whole_brain_degree/wmap_'+suffix
         actual_map = subj['subjdir']+'/'+processedfmri_folder+'/whole_brain_degree/whole_brain_degree.nii'
+    elif processing_type == 'fALFF':
+        wmapdir = subj['subjdir']+'/'+'interfmri_TRCNnSFmDI/denoised/ALFF/ALFF_results/wmap_'+suffix
+        actual_map = subj['subjdir']+'/'+'interfmri_TRCNnSFmDI/denoised/ALFF/ALFF_results/mfALFFMap_detrend_LF.nii'
 
     if os.path.exists(wmapdir):                     #...check if they have already been run. Skip if they have, or else...
         print(os.path.split(subj['subjdir'])[0]+' has already been run! Will be skipped.')
