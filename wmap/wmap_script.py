@@ -1,21 +1,24 @@
-#!/usr/bin/env python
+####################################################### w-map script 1/29/16 ########################################################################
+#THIS SOFTWARE IS PROVIDED BY THE SEELEY LAB "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE SEELEY LAB BE LIABLE FOR ANY
+#DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+#GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#Import modules needed
 import os
 import glob
 import pandas
-import nipype.interfaces.fsl as fsl
-
 
 ########################################################### USER OPTIONS ###########################################################################
-#Prompt user to choose type of wmap.
-processing_type = raw_input("Enter FC for functional connectivity wmap\n"
-                            "Enter GMA for gray matter atrophy wmap\n"
-                            "Enter WBD for whole brain degree wmap.\n"
-                            "Enter fALFF for fALFF wmap.\n")
+#Prompt user to choose type of w-map.
+processing_type = raw_input('1. Enter FC for functional connectivity w-map, GMA for gray matter atrophy w-map, or WBD for whole brain degree w-map.\n')
 
-while (processing_type != "FC" or processing_type != "GMA" or processing_type != "WBD" or
-       processing_type != "fALFF"):
-    processing_type = raw_input("Error--Specified processing type is not a valid option. "
-                                "Enter a valid choice.\n")
+if processing_type != 'FC' and processing_type != 'GMA' and processing_type != 'WBD':
+    processing_type = raw_input('Error--Specified processing type is not a valid option. Enter FC for functional connectivity w-map or GMA for gray matter atrophy w-map.\n')
+else:
+    pass
 
 #If FC w-maps are wanted, prompt user for processedfmri folder name and seed folder name.
 if processing_type == 'FC':
