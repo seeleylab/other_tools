@@ -1,10 +1,5 @@
-####################################################### w-map script 1/29/16 ########################################################################
-#THIS SOFTWARE IS PROVIDED BY THE SEELEY LAB "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE SEELEY LAB BE LIABLE FOR ANY
-#DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-#GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-#CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-#ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+####################################################### w-map script 12/4/15 ########################################################################
+#DISCLAIMER: THE SEELEY LAB IS NOT RESPONSIBLE FOR ANY INACCURATE CONCLUSIONS DRAWN AS A RESULT OF USING THIS SCRIPT.
 
 #Import modules needed
 import os
@@ -13,9 +8,9 @@ import pandas
 
 ########################################################### USER OPTIONS ###########################################################################
 #Prompt user to choose type of w-map.
-processing_type = raw_input('1. Enter FC for functional connectivity w-map, GMA for gray matter atrophy w-map, or WBD for whole brain degree w-map.\n')
+processing_type = raw_input('1. Enter FC for functional connectivity w-map or GMA for gray matter atrophy w-map.\n')
 
-if processing_type != 'FC' and processing_type != 'GMA' and processing_type != 'WBD':
+if processing_type != 'FC' and processing_type != 'GMA':
     processing_type = raw_input('Error--Specified processing type is not a valid option. Enter FC for functional connectivity w-map or GMA for gray matter atrophy w-map.\n')
 else:
     pass
@@ -28,14 +23,6 @@ if processing_type == 'FC':
     else:
         pass
     seed_folder = raw_input('Specify the folder containing the seed results for each subject (e.g. stats_FC_L_PostCen_4--42_-20_56_roi):\n')
-
-#If WBD w-maps are wanted, prompt user for processedfmri folder name.
-if processing_type == 'WBD':
-    processedfmri_folder = raw_input('\nAll subjects are assumed to have a processedfmri_TRCNnSFmDI folder. If your subjects have a processedfmri folder with a different extension, specify that folder below (e.g. processedfmri_RTCsNsSFmI). Otherwise, hit Enter.\n')
-    if processedfmri_folder == '':
-        processedfmri_folder = 'processedfmri_TRCNnSFmDI'
-    else:
-        pass
 
 #Prompt user for Excel spreadsheet containing subjdir column and covariate columns.
 xl_f = raw_input('\n2. Enter the path of the Excel spreadsheet containing the subjects you want w-maps for.\n')
@@ -66,16 +53,6 @@ if processing_type == 'GMA':
             print('Error--'+os.path.split(i)[0]+'/struc/SPM12_SEG_Full/smwc1* does not exist. Run segmentation and try again.')  
     print('Finished checking.')
 
-#If WBD w-maps are wanted, check that each subjdir directory has a whole_brain_degree.nii file necessary for creating the w-maps.
-if processing_type == 'WBD':
-    print('Checking each subject for whole_brain_degree.nii image...')
-    for i in df.ix[:,'subjdir']:
-        if os.path.exists(i+'/'+processedfmri_folder+'/whole_brain_degree/whole_brain_degree.nii'):
-            pass
-        else:
-            print('Error--'+i+'/'+processedfmri_folder+'/whole_brain_degree/whole_brain_degree.nii does not exist. Check and try again.')
-    print('Finished checking.')
-
 #Prompt user for the directory containing all of the HC regression model files.
 HC_model = raw_input('\n3. Enter the directory containing the HC regression model. Please make sure that the order of the covariate columns in your spreadsheet matches the order of the beta maps in your HC regression model. If not, press Control-C to exit.\n')
 
@@ -103,9 +80,6 @@ for index,row in df.iterrows():         #Loop through each subject and define pa
     elif processing_type == 'GMA':
         wmapdir = os.path.split(subj['subjdir'])[0]+'/struc/SPM12_SEG_Full/wmap_'+suffix
         actual_map = glob.glob(os.path.split(subj['subjdir'])[0]+'/struc/SPM12_SEG_Full/smwc1*')[0]
-    elif processing_type == 'WBD':
-        wmapdir = subj['subjdir']+'/'+processedfmri_folder+'/whole_brain_degree/wmap_'+suffix
-        actual_map = subj['subjdir']+'/'+processedfmri_folder+'/whole_brain_degree/whole_brain_degree.nii'
 
     if os.path.exists(wmapdir):                     #...check if they have already been run. Skip if they have, or else...
         print(os.path.split(subj['subjdir'])[0]+' has already been run! Will be skipped.')
