@@ -1,6 +1,0 @@
-*.pyc
-build/
-dist/
-.DS_Store
-HC_models
-development
