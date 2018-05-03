@@ -1,0 +1,29 @@
+﻿FC runthrough
+seed
+stats_FC_L_PostCen_4--42_-20_56_roi
+
+Excel spreadsheet
+/data/mridata/jdeng/tools/make_wmaps/jerseys_xl_f_FC.xlsx
+
+HC regression model
+/data2/mridata2/Suzee/studies/W-score_multiple_regressions/rsfmri_multiple_regressions/GRN_seeds/L_PCG
+
+mask
+/data2/mridata2/Suzee/studies/GRN_rsfmri/1SampT/NKI_GenPop_demo_matched/1ST_no_TIV/masks/pfwe01/PostCen/old_v2/L_R_PostCen_unified_subcor_cer_ICVgm02_binary_91x109x91.nii
+
+Clear created folders
+for path in /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/29/29_20121022/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/62/62_20090527/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/98/98_20141217/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/247/247_20141202/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/378/378_20130408/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/506/506_20141202/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/526/526_20121022/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/586/586_20090205/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/675/675_20100217/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/704/704_20090615/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/838/838_20090616/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/856/856_20091106/rsfmri; do rm -r ${path}/processedfmri_TRCNnSFmDI/stats_FC_L_PostCen_4--42_-20_56_roi/wmap*; done
+
+———————
+GMA runthrough
+Excel spreadsheet
+/data/mridata/jdeng/tools/make_wmaps/jerseys_xl_f_GMA.xlsx
+
+HC regression model
+/data/mridata/asias/W-score/GRNpresymp_288HC_mulreg_nocenter_withAmbi
+
+mask
+/data2/mridata2/Suzee/templates/SPM12_gm_prob_mask/SPM12_gm02_maskICV_subcor_mask.nii
+
+Clear created folders
+for path in /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/704/704_20090615/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/838/838_20090616/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/62/62_20090527/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/526/526_20121022/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/29/29_20121022/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/586/586_20090205/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/856/856_20091106/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/675/675_20100217/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/543/543_20120618/rsfmri  /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/378/378_20130408/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/247/247_20141202/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/506/506_20141202/rsfmri /data/mridata/jdeng/w_score_sandbox/Presymp_GRN_pos/98/98_20141217/rsfmri; do cd ${path}; cd ..; rm -r struc/SPM12_SEG_Full/wmap*; done
