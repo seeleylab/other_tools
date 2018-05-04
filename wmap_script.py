@@ -54,7 +54,7 @@ if processing_type == 'FC':
 if processing_type == 'GMA':
     print('Checking each subject for smwc1 image...')
     for i in df.ix[:,'subjdir']:
-        if len(glob.glob(i+'/smwwc1*')) == 1:
+        if len(glob.glob(i+'/smwc1avgj*')) == 1:
             pass
         else:
             print('Error--'+i+'/smwc1* does not exist. Run segmentation and try again.')  
@@ -97,7 +97,7 @@ for index,row in df.iterrows():         #Loop through each subject and define pa
     elif processing_type == 'GMA':
         wmapdir = subj['subjdir']+'/wmap_'+suffix
         # actual_map = glob.glob(subj['subjdir']+'/smwwc1*')[0]
-	actual_map_list = glob.glob(subj['subjdir']+'/smwwc1*')
+	actual_map_list = glob.glob(subj['subjdir']+'/smwc1avgj*')
 	if len(actual_map_list) < 1:
 		print(subj['subjdir']+' has no segmentation! Will be skipped.')
 	else:
